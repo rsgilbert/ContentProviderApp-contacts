@@ -1,6 +1,8 @@
 package com.example.contentproviderapp;
 
+import android.Manifest;
 import android.content.ContentResolver;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
 
@@ -9,6 +11,8 @@ import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import android.util.Log;
 import android.view.View;
@@ -24,6 +28,8 @@ import android.provider.ContactsContract;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private ListView contactNames;
+    private static final int REQUEST_CODE_READ_CONTACTS = 1;
+    private static boolean READ_CONTACTS_GRANTED = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +40,18 @@ public class MainActivity extends AppCompatActivity {
 
 
         contactNames = (ListView) findViewById(R.id.contact_names);
+
+        int hasReadContactsPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
+        Log.d(TAG, "onCreate, checkSelfPermission: " + hasReadContactsPermission);
+
+
+        if(hasReadContactsPermission == PackageManager.PERMISSION_GRANTED) {
+            Log.d(TAG, "onCREATE: permission granted");
+            READ_CONTACTS_GRANTED = true;
+        } else {
+            Log.d(TAG, "onCreate: requesting permission");
+            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.READ_CONTACTS}, REQUEST_CODE_READ_CONTACTS);
+        }
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -60,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "fab click: end");
             }
         });
+        Log.d(this, "onCREATE: ends here");
     }
 
     @Override
